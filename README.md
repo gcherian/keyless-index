@@ -19,23 +19,23 @@ A full unique index is like a map, which takes only one function a pk extractor.
 
 ###Usage
 
-NonUniqueIndex nui = new NonUniqueIndex(Person::getId,Person::getName)
-Person george1 = new Person(1,"George")
-Person george2 = new Person(2,"George")
-Person cherian = new Person(3,"Cherian")
+    NonUniqueIndex nui = new NonUniqueIndex(Person::getId,Person::getName)
+    Person george1 = new Person(1,"George")
+    Person george2 = new Person(2,"George")
+    Person cherian = new Person(3,"Cherian")
 
-nui.put(george1)
-nui.put(george2)
-nui.put(cherian)
+    nui.put(george1)
+    nui.put(george2)
+    nui.put(cherian)
 
-+----------------+
-| george1|george2|
-+----------------+
-|     cherian    |
-+----------------+
+    +----------------+
+    | george1|george2|
+    +----------------+
+    |     cherian    |
+    +----------------+
 
-FullUniqueIndex fui = nui.get(george1)
-Person george2 = fui.get(george2)
+    FullUniqueIndex fui = nui.get(george1)
+    Person george2 = fui.get(george2)
 
 ###Storage
 
