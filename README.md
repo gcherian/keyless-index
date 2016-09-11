@@ -1,6 +1,8 @@
 Keyless Index
 ------------------------------
 
+This is a list data structure, which has all the inherent features of a map, or a multimap.
+
 ### Problem
 Traditionally data that can be looked up is stored in a map with key and value. Imagine we just have a list of objects, we need to convert this back and forth to a map if we have to lookup this based on a particular attribute in the object.
 This is not only extra effort for the developer, to write these custom key extractors, it mandates a new compile time structure for every attribute you want to use as a key in the map.
