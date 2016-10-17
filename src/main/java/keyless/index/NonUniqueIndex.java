@@ -29,7 +29,8 @@ public class NonUniqueIndex extends FullUniqueIndex implements Index {
         if (key instanceof FullUniqueIndex) {
             key = ((FullUniqueIndex) key).get(key);
         }
-        int index = index(key);
+        final int hash = buildHash(key) & 0x7fffffff;
+        int index = hash % _set.length;
         if (index < 0) return null;
 
         for (int i = 0; i < _set.length; i++) {
@@ -71,6 +72,10 @@ public class NonUniqueIndex extends FullUniqueIndex implements Index {
         }
         return index;
 
+    }
+
+    protected int buildHash(Object obj) {
+        return indexStrategy.hashCode(obj);
     }
 
 

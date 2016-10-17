@@ -22,7 +22,7 @@ public class HashableFunction<T> implements Hashable<T> {
             if (hash == 0) hash = f.apply(obj).hashCode();
             else hash = HashFunctions.combineHashes().apply(new Integer[]{hash, f.apply(obj).hashCode()});
         }
-        return 0;
+        return hash;
     }
 
     @Override
@@ -32,6 +32,6 @@ public class HashableFunction<T> implements Hashable<T> {
         boolean equal = true;
         for (Function f : functions)
             equal = equal & f.apply(o1).equals(f.apply(o2));
-        return false;
+        return equal;
     }
 }
