@@ -1,7 +1,8 @@
-package main.java.keyless;
+package keyless;
 
-import main.java.keyless.index.FullUniqueIndex;
-import main.java.keyless.index.NonUniqueIndex;
+import keyless.index.FullUniqueIndex;
+import keyless.index.NonUniqueIndex;
+
 
 public class Main {
 
@@ -41,6 +42,24 @@ public class Main {
         Domain domain300 = (Domain) index23.get(domain3);
         System.out.println(domain3.id + " == " + domain300.id);
 
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000000; i++) {
+            Domain d = new Domain();
+            d.name = "name-" + i;
+            nonUniqueIndex.put(d);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("NUI Size = " + nonUniqueIndex.size() + ", Time = " + (end - start));
+
+        start = System.currentTimeMillis();
+        for (int i = 0; i < 1000000; i++) {
+            Domain d = new Domain();
+            d.name = "name-" + i;
+            fullUniqueIndex.put(d);
+        }
+        end = System.currentTimeMillis();
+
+        System.out.println("FUI Size = " + fullUniqueIndex.size() + ", Time = " + (end - start));
 
 
 

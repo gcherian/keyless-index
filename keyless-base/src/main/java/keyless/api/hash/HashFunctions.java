@@ -8,7 +8,7 @@
 // suitability of this software for any purpose. It is provided "as is"
 // without expressed or implied warranty.
 
-package main.java.keyless.api.hash;
+package keyless.api.hash;
 
 import java.util.function.Function;
 

@@ -1,4 +1,4 @@
-package main.java.keyless.api.op;
+package keyless.api.op;
 
 /**
  * Created by georg on 1/28/2016.

@@ -1,6 +1,6 @@
-package main.java.keyless.api.hash;
+package keyless.api.hash;
 
-import main.java.keyless.api.Hashable;
+import keyless.api.Hashable;
 
 import java.util.function.Function;
 

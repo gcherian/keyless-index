@@ -1,4 +1,4 @@
-package main.java.keyless.api;
+package keyless.api;
 
 import java.util.function.Function;
 

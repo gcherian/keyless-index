@@ -1,14 +1,14 @@
-package main.java.keyless.index;
+package keyless.index;
 
-import main.java.keyless.api.Hashable;
-import main.java.keyless.api.hash.HashableFunction;
+import keyless.api.Hashable;
+import keyless.api.hash.HashableFunction;
 
 import java.util.function.Function;
 
 /**
  * Created by georg on 1/28/2016.
  */
-public class NonUniqueIndex extends FullUniqueIndex implements Index {
+public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
     private Hashable indexStrategy = null;
 
     public Hashable getIndexStrategy() {
@@ -25,10 +25,8 @@ public class NonUniqueIndex extends FullUniqueIndex implements Index {
         this.indexStrategy = new HashableFunction<>(indexFunctions);
     }
 
-    public Object get(Object key) {
-        if (key instanceof FullUniqueIndex) {
-            key = ((FullUniqueIndex) key).get(key);
-        }
+    public Object get(T key) {
+
         final int hash = buildHash(key) & 0x7fffffff;
         int index = hash % _set.length;
         if (index < 0) return null;
@@ -44,7 +42,14 @@ public class NonUniqueIndex extends FullUniqueIndex implements Index {
         return null;
     }
 
-    public int put(Object key) {
+    public int put(T key) {
+        int index = insertValue(key);
+        postInsertHook(false);
+        return index;
+
+    }
+
+    protected int insertValue(T key) {
         consumeFreeSlot = false;
         if (key == null) return insertKeyForNull();
 
@@ -67,11 +72,10 @@ public class NonUniqueIndex extends FullUniqueIndex implements Index {
                 _set[index] = fui;
                 return index;
             } else {
-                index = insertKeyRehash(key, index, hash, cur);
+                return insertKeyRehash(key, index, hash, cur);
             }
         }
         return index;
-
     }
 
     protected int buildHash(Object obj) {

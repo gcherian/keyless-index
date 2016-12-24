@@ -1,4 +1,4 @@
-package main.java.keyless.api;
+package keyless.api;
 
 /**
  * Created by georg on 1/26/2016.

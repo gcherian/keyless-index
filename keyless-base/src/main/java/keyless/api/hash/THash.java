@@ -1,4 +1,4 @@
-package main.java.keyless.api.hash;
+package keyless.api.hash;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2001, Eric D. Friedman All Rights Reserved.

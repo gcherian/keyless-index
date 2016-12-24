@@ -1,17 +1,18 @@
-package main.java.keyless.index;
+package keyless.index;
 
-import main.java.keyless.api.Hashable;
-import main.java.keyless.api.Procedure;
-import main.java.keyless.api.hash.HashableFunction;
-import main.java.keyless.api.hash.TObjectHash;
+import keyless.api.Hashable;
+import keyless.api.Procedure;
+import keyless.api.hash.HashableFunction;
+import keyless.api.hash.TObjectHash;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.function.Function;
 
 /**
  * Created by georg on 1/26/2016.
  */
-public class FullUniqueIndex extends TObjectHash implements Index {
+public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
 
     protected final Hashable strategy;
 
@@ -29,14 +30,14 @@ public class FullUniqueIndex extends TObjectHash implements Index {
     }
 
     @Override
-    public int put(Object value) {
+    public int put(T value) {
         int index = insertKey(value);
         postInsertHook(false);
         return index;
     }
 
     @Override
-    public Object get(Object key) {
+    public Object get(T key) {
         int index = index(key);
         if (index >= 0) return _set[index];
         return null;
@@ -55,9 +56,15 @@ public class FullUniqueIndex extends TObjectHash implements Index {
     }
 
     @Override
+    public Iterator iterator() {
+        return null;
+    }
+
+    @Override
     public Index transform(Function f) {
         return null;
     }
+
 
     @Override
     protected void rehash(int newCapacity) {
@@ -70,7 +77,7 @@ public class FullUniqueIndex extends TObjectHash implements Index {
             if (o == FREE || o == REMOVED) continue;
             ;
 
-            insertKey(o);
+            insertKey((T) o);
         }
 
     }

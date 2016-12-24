@@ -18,9 +18,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ///////////////////////////////////////////////////////////////////////////////
 
-package main.java.keyless.api.hash;
+package keyless.api.hash;
 
-import main.java.keyless.api.Procedure;
+import keyless.api.Procedure;
 
 import java.io.IOException;
 import java.io.ObjectInput;

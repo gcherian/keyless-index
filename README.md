@@ -45,4 +45,10 @@ The Non Unique Index  is just another list of Full Unique Indices.In the above e
 - on index 0 we have a Full Unique Index with two george objects.
 - on index 1 we have an single object cherian, as it is unique by index key.
 
+###Extension
+
+The datastructure is extended to distribuite and  scale by using Spark RDD in the keyless-rdd module. This module uses the keyless-base module which has the code for single JVM.
+
+
+
 

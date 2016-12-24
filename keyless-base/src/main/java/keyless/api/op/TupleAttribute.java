@@ -1,8 +1,8 @@
-package main.java.keyless.api.op;
+package keyless.api.op;
 
 
-import main.java.keyless.api.Attribute;
-import main.java.keyless.api.Operation;
+import keyless.api.Attribute;
+import keyless.api.Operation;
 
 /**
  * Created by georg on 1/28/2016.

@@ -1,4 +1,4 @@
-package main.java.keyless;
+package keyless;
 
 import java.util.UUID;
 import java.util.function.Function;
