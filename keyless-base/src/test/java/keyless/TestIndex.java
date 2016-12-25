@@ -1,9 +1,7 @@
 package keyless;
 
-import com.sun.java.browser.plugin2.DOM;
 import keyless.index.FullUniqueIndex;
 import keyless.index.NonUniqueIndex;
-import org.junit.Test;
 
 import java.util.Iterator;
 
@@ -14,7 +12,6 @@ import java.util.Iterator;
 
 public class TestIndex {
 
-    @Test
     public void testFullUniqueIndexPerformance() {
         FullUniqueIndex fullUniqueIndex = new FullUniqueIndex(Domain.id());
 
@@ -31,7 +28,6 @@ public class TestIndex {
 
     }
 
-    @Test
     public void testNonUniqueIndexPerformance() {
 
         NonUniqueIndex nonUniqueIndex = new NonUniqueIndex(Domain.id(), Domain.name());
@@ -49,7 +45,6 @@ public class TestIndex {
 
     }
 
-    @Test
     public void testFullUniqueIndexIterator() {
 
         FullUniqueIndex<Domain> fullUniqueIndex = new FullUniqueIndex(Domain.id());
@@ -69,7 +64,6 @@ public class TestIndex {
 
     }
 
-    @Test
     public void testNonUniqueIndexIterator() {
 
         NonUniqueIndex<Domain> nonUniqueIndex = new NonUniqueIndex<Domain>(Domain.id(), Domain.name());
