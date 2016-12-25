@@ -3,6 +3,7 @@ package keyless.index;
 import keyless.api.Hashable;
 import keyless.api.hash.HashableFunction;
 
+import java.util.Iterator;
 import java.util.function.Function;
 
 /**
@@ -82,5 +83,26 @@ public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
         return indexStrategy.hashCode(obj);
     }
 
+    @Override
+    public Iterator<T> iterator() {
+        return new MultiValueIterator<T>();
+    }
+
+    protected class MultiValueIterator<T> extends ValueIterator<T> {
+        @Override
+        public T next() {
+            T next = null;
+            do {
+                next = nextInner();
+            } while (hasNext() && (next == null || next == FREE || next == REMOVED));
+            if (next != FREE && next != REMOVED) {
+                if (next instanceof FullUniqueIndex) {
+                    return (T) ((FullUniqueIndex) next).getFirst();
+                }
+                return next;
+
+            } else return null;
+        }
+    }
 
 }

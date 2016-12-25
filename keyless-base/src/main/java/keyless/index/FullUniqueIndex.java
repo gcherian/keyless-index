@@ -5,8 +5,8 @@ import keyless.api.Procedure;
 import keyless.api.hash.HashableFunction;
 import keyless.api.hash.TObjectHash;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -56,8 +56,8 @@ public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
     }
 
     @Override
-    public Iterator iterator() {
-        return null;
+    public Iterator<T> iterator() {
+        return new ValueIterator<T>();
     }
 
     @Override
@@ -85,4 +85,49 @@ public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
     protected int buildHash(Object obj) {
         return strategy.hashCode(obj);
     }
+
+    protected class ValueIterator<T> implements Iterator<T> {
+
+
+        int cursor = 0;
+        int lastRet = -1;
+
+
+        public boolean hasNext() {
+            boolean hasValue = false;
+            for (int i = cursor; i < _set.length; i++) {
+                if (_set[i] != FREE && _set[i] != REMOVED) hasValue = true;
+            }
+            return hasValue && cursor < _set.length;
+        }
+
+        public T next() {
+            T next = null;
+            do {
+                next = nextInner();
+            } while (hasNext() && (next == null || next == FREE || next == REMOVED));
+            if (next != FREE && next != REMOVED) return next;
+            else return null;
+        }
+
+        protected T nextInner() {
+            try {
+                int i = cursor;
+                T next = (T) _set[i];
+                lastRet = i;
+                cursor = i + 1;
+                return next;
+            } catch (IndexOutOfBoundsException e) {
+                throw new NoSuchElementException();
+            }
+        }
+
+        public void remove() {
+            throw new RuntimeException("Index cannot be modified using iterators.");
+        }
+
+
+    }
 }
+
+
