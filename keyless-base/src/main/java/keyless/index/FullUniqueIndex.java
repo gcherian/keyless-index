@@ -8,6 +8,7 @@ import keyless.api.hash.TObjectHash;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Created by georg on 1/26/2016.
@@ -61,10 +62,31 @@ public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
     }
 
     @Override
-    public Index transform(Function f) {
-        return null;
+    public <V> Index map(Function<T, V> f) {
+        Index<V> newIndex = new FullUniqueIndex<V>(strategy);
+        foreach(each -> {
+            if (each != FREE && each != REMOVED) {
+                newIndex.put(f.apply((T) each));
+            }
+            return true;
+        });
+        return newIndex;
     }
 
+    @Override
+    public Index<T> filter(Predicate<T> f) {
+        Index newIndex = new FullUniqueIndex(strategy);
+
+        foreach(each -> {
+            if (each != FREE && each != REMOVED && f.test((T) each)) {
+                newIndex.put(each);
+            }
+            return true;
+        });
+
+
+        return newIndex;
+    }
 
     @Override
     protected void rehash(int newCapacity) {

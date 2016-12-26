@@ -5,6 +5,7 @@ import keyless.api.hash.HashableFunction;
 
 import java.util.Iterator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Created by georg on 1/28/2016.
@@ -77,6 +78,57 @@ public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
             }
         }
         return index;
+    }
+
+    @Override
+    public <V> Index map(Function<T, V> f) {
+        Index<V> newIndex = new NonUniqueIndex<V>(strategy, indexStrategy);
+        foreach(each -> {
+            if (each != FREE && each != REMOVED) {
+                if (each instanceof FullUniqueIndex) {
+                    FullUniqueIndex<T> fui = (FullUniqueIndex) each;
+                    fui.foreach(e -> {
+                        if (e != FREE && e != REMOVED) {
+                            newIndex.put(f.apply((T) e));
+                        }
+                        return true;
+                    });
+                } else {
+                    newIndex.put(f.apply((T) each));
+                }
+
+            }
+            return true;
+        });
+        return newIndex;
+    }
+
+    @Override
+    public Index<T> filter(Predicate<T> f) {
+        Index newIndex = new NonUniqueIndex<T>(strategy, indexStrategy);
+
+        foreach(each -> {
+            if (each != FREE && each != REMOVED) {
+                if (each instanceof FullUniqueIndex) {
+                    FullUniqueIndex<T> fui = (FullUniqueIndex) each;
+                    fui.foreach(e -> {
+                        if (e != FREE && e != REMOVED && f.test((T) each)) {
+                            newIndex.put((T) e);
+                        }
+                        return true;
+                    });
+                } else {
+                    if (f.test((T) each)) {
+                        newIndex.put(each);
+                    }
+                }
+
+            }
+            return true;
+        });
+
+
+        return newIndex;
     }
 
     protected int buildHash(Object obj) {
