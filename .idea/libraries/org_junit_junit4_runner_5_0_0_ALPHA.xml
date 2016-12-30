@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="org.junit:junit4-runner:5.0.0-ALPHA" type="repository">
+    <properties maven-id="org.junit:junit4-runner:5.0.0-ALPHA" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/junit/junit4-runner/5.0.0-ALPHA/junit4-runner-5.0.0-ALPHA.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/junit/junit-launcher/5.0.0-ALPHA/junit-launcher-5.0.0-ALPHA.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/junit/junit-engine-api/5.0.0-ALPHA/junit-engine-api-5.0.0-ALPHA.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/junit/junit-commons/5.0.0-ALPHA/junit-commons-5.0.0-ALPHA.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/opentest4j/opentest4j/1.0.0-ALPHA/opentest4j-1.0.0-ALPHA.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
