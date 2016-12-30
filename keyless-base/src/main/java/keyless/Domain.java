@@ -1,13 +1,14 @@
 package keyless;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.function.Function;
 
 /**
  * Created by georg on 10/17/2016.
  */
-public class Domain {
-    final String id;
+public class Domain implements Serializable {
+    public final String id;
     final long timestamp;
     String attribute;
     long variability;
@@ -18,6 +19,12 @@ public class Domain {
     public Domain() {
         this.id = UUID.randomUUID().toString();
         this.timestamp = System.currentTimeMillis();
+    }
+
+    public Domain(String name) {
+        this.id = UUID.randomUUID().toString();
+        this.timestamp = System.currentTimeMillis();
+        this.name = name;
     }
 
 
