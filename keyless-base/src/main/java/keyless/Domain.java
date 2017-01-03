@@ -8,7 +8,37 @@ import java.util.function.Function;
  * Created by georg on 10/17/2016.
  */
 public class Domain implements Serializable {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Domain)) return false;
+
+        Domain domain = (Domain) o;
+
+        return id.equals(domain.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
     public final String id;
+
+    @Override
+    public String toString() {
+        return "Domain{" +
+                "id='" + id + '\'' +
+                ", timestamp=" + timestamp +
+                ", attribute='" + attribute + '\'' +
+                ", variability=" + variability +
+                ", invariance=" + invariance +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
+
     final long timestamp;
     String attribute;
     long variability;

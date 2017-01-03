@@ -5,7 +5,7 @@ import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{HashPartitioner, OneToOneDependency, Partition, TaskContext}
-
+import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 
 /**
@@ -46,9 +46,16 @@ class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
     partitionsRDD.map(_.size).reduce(_ + _)
   }
 
+  def defaultValue[U]: U = {
+    class Default[U] {
+      var default: U = _
+    }; new Default[U].default
+  }
+
   def get(k: T): T = {
+    var defaultResult: T = defaultValue[T]
     val result = multiget(List(k))
-    if (result.length > 0) result(0) else k
+    if (result.length > 0) result(0) else defaultResult
   }
 
   def multiget(ks: List[T]): List[T] = {
@@ -80,7 +87,9 @@ class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
   (other: RDD[(K, V)])(f: OtherZipPartitionsFunction[V, T]): KeylessRDD[T, K, I] = {
     val partitioned = other.partitionBy(partitioner.get)
     val newPartitionsRDD = partitionsRDD.zipPartitions(partitioned, true)(f)
-    new KeylessRDD(newPartitionsRDD, keyFunction, indexFunction)
+    val newRdd = new KeylessRDD(newPartitionsRDD, keyFunction, indexFunction)
+    newRdd.foreach(t => println(t))
+    newRdd
   }
 
   private type OtherZipPartitionsFunction[V, U] = Function2[Iterator[KeylessRDDPartition[T]], Iterator[(K, V)], Iterator[KeylessRDDPartition[U]]]
