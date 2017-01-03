@@ -24,7 +24,7 @@ public class Domain implements Serializable {
         return id.hashCode();
     }
 
-    public final String id;
+    public String id;
 
     @Override
     public String toString() {

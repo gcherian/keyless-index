@@ -25,12 +25,16 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
   test("get") {
     var rdd = domains(sc, 1)
     println(rdd.count())
-    val domains1: List[Domain] = List[Domain](new Domain("name-11"), new Domain("name-17"))
+    val putDomain11: Domain = new Domain("name-11")
+    val domains1: List[Domain] = List[Domain](putDomain11, new Domain("name-17"))
     print(rdd.toDebugString)
     rdd = rdd.multiput(domains1)
     println(rdd.toDebugString)
-    val domain11 = rdd.get(new Domain("name-11"))
+    val getDomain11: Domain = new Domain("name-11")
+    getDomain11.id = putDomain11.id
+    val domain11 = rdd.get(getDomain11)
     println(domain11)
+    assertResult(domain11.id)(getDomain11.id)
     rdd.foreach(d => println(d))
 
 
