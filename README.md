@@ -15,26 +15,26 @@ This uses open hashing with linear probing for efficient lookups using an index 
 This makes the storage as simple as possible for every kind of objects, there is no map of map of maps, instead, there is only lists, each element can be an object or a list.
 
 A non unique index is like a multimap, which takes two functions (an index extractor and a pk (primary key) extractor.
-A full unique index is like a map, which takes only one function a pk extractor.
+A full unique index is like a map, which takes only one function a pk extractor. This way it allows to build a hierarchy of objects.
 
 
 
 ###Usage
 
-    NonUniqueIndex nui = new NonUniqueIndex(Person::getId,Person::getName)
-    Person george1 = new Person(1,"George")
-    Person george2 = new Person(2,"George")
-    Person cherian = new Person(3,"Cherian")
+    NonUniqueIndex nui = new NonUniqueIndex(Domain::getId,Domain::getName)
+    Domain audioAmplitude =  new Domain(1,"Audio","Pitch")
+    Domain audioFrequency =  new Domain(2,"Audio","Spectral")
+    Domain visualColor = new Domain(3,"Visual","Color")
+    
+    nui.put(audioAmplitude)
+    nui.put(audioFrequency)
+    nui.put(visualColor)
 
-    nui.put(george1)
-    nui.put(george2)
-    nui.put(cherian)
-
-    +----------------+
-    | george1|george2|
-    +----------------+
-    |     cherian    |
-    +----------------+
+    +--------------------------------+
+    | audioAmplitude | audioFrequency|
+    +--------------------------------+
+    |            visualColor         |
+    +--------------------------------+
 
     FullUniqueIndex fui = nui.get(george1)
     Person george2 = fui.get(george2)

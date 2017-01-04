@@ -43,7 +43,7 @@ public class Domain implements Serializable {
     String attribute;
     long variability;
     long invariance;
-    String name;
+    public String name;
     String type;
 
     public Domain() {
