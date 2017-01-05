@@ -14,17 +14,17 @@ import scala.collection.JavaConversions._
 class KeylessRDDSuite extends FunSuite with SharedSparkContext {
 
 
-  def creareFui(rdd: RDD[Domain]) = {
-    KeylessRDD[Domain, String](rdd, d => d.id)
+  def createFui(rdd: RDD[Domain], keyFunction: (Domain) => String = d => d.id) = {
+    KeylessRDD[Domain, String](rdd, keyFunction)
   }
 
-  def creareNui(rdd: RDD[Domain]) = {
-    KeylessRDD[Domain, String, String](rdd, d => d.id, d => d.name)
+  def createNui(rdd: RDD[Domain], keyFunction: (Domain) => String = d => d.id, indexFunction: (Domain) => String = d => d.name) = {
+    KeylessRDD[Domain, String, String](rdd, keyFunction, indexFunction)
   }
 
 
   test("fui") {
-    var rdd = creareFui(sc.parallelize((0 to 1).map(x => (new Domain("name-" + x))), 5))
+    var rdd = createFui(sc.parallelize((0 to 10000).map(x => (new Domain("name-" + x))), 10))
     println(rdd.count())
     val putDomain11: Domain = new Domain("name-11")
     val domains1: List[Domain] = List[Domain](putDomain11, new Domain("name-17"))
@@ -36,14 +36,15 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
     val domain11 = rdd.get(getDomain11)
     println(domain11)
     rdd.foreach(d => println(d))
+    rdd.mapPartitionsWithIndex { (partitionIndex, dataIterator) => dataIterator.map(dataInfo => (dataInfo + " fui is located in  " + partitionIndex + " partition.")) }.foreach(println)
     assertResult(getDomain11.id)(domain11.id)
-
+    println(rdd.count())
 
   }
 
   test("nui") {
 
-    var rdd = creareNui(sc.parallelize((0 to 1).map(x => (new Domain("name-" + x))), 5))
+    var rdd = createNui(sc.parallelize((0 to 10000).map(x => (new Domain("name-" + x % 10))), 10))
     val putDomain11: Domain = new Domain("name-11")
     val domains1: List[Domain] = List[Domain](putDomain11, new Domain("name-17"))
     rdd = rdd.multiput(domains1)
@@ -51,8 +52,9 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
     getDomain11.id = putDomain11.id
     val domain11 = rdd.get(getDomain11)
     rdd.foreach(d => println(d))
+    rdd.mapPartitionsWithIndex { (partitionIndex, dataIterator) => dataIterator.map(dataInfo => (dataInfo + " nui is located in  " + partitionIndex + " partition.")) }.foreach(println)
     assertResult(getDomain11.name)(domain11.name)
-
+    println(rdd.count())
 
 
 
@@ -60,10 +62,10 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
 
   test("hier") {
 
-    val apartment: List[Room] = List[Room](new Room("1024", "1", 1, "blue", 700), new Room("1024", "2", 4, "red", 1500))
-    val building = KeylessRDD[Room, String](sc.parallelize(apartment), r => r.getId())
-    val complex = KeylessRDD[Room, String, String](sc.parallelize(building.getAll()), building.keyFunction, r => r.getFloor())
-    complex.foreach(r => println(r))
+    val house: List[Room] = List[Room](new Room("1024", "1", 1, "blue", 700), new Room("1024", "2", 4, "red", 1500))
+    val floor = KeylessRDD[Room, String](sc.parallelize(house), r => r.getId())
+    val tower = KeylessRDD[Room, String, String](sc.parallelize(floor.getAll()), floor.keyFunction, r => r.getFloor())
+    tower.foreach(r => println(r))
   }
 
 
