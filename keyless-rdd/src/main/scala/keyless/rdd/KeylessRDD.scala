@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
   * Created by georg on 12/19/2016.
   */
 class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
-(private val partitionsRDD: RDD[KeylessRDDPartition[T]], private val keyFunction: T => K, private val indexFunction: T => I = null) extends RDD[T](partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
+(private val partitionsRDD: RDD[KeylessRDDPartition[T]], val keyFunction: T => K, val indexFunction: T => I = null) extends RDD[T](partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
 
   require(partitionsRDD.partitioner.isDefined)
   override val partitioner = partitionsRDD.partitioner
@@ -58,6 +58,20 @@ class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
     if (result.length > 0) result(0) else defaultResult
   }
 
+  def getAll(): List[T] = {
+    val all: List[T] = List()
+    partitionsRDD.foreachPartition(partIter => {
+      if (partIter.hasNext) {
+        val part = partIter.next()
+        all ::: (part.getAll())
+      }
+    }
+
+    )
+    all
+
+  }
+
   def multiget(ks: List[T]): List[T] = {
     val ksByPartition = ks.groupBy(k => partitioner.get.getPartition(k))
     val partitions = ksByPartition.keys.toSeq
@@ -92,7 +106,7 @@ class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
     newRdd
   }
 
-  private type OtherZipPartitionsFunction[V, U] = Function2[Iterator[KeylessRDDPartition[T]], Iterator[(K, V)], Iterator[KeylessRDDPartition[U]]]
+  private type OtherZipPartitionsFunction[V, U] = (Iterator[KeylessRDDPartition[T]], Iterator[(K, V)]) => Iterator[KeylessRDDPartition[U]]
 
 
   private class MultiputZipper[U: ClassTag](z: (U) => T, f: (T, U) => T)

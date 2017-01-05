@@ -34,6 +34,7 @@ class KeylessRDDPartitionImpl[T: ClassTag, K: ClassTag, I: ClassTag]
 
   override def iterator: Iterator[T] = index.iterator()
 
+  override def getAll: List[T] = index.iterator().toList
 
   override def get(v: T): T = index.get(v).asInstanceOf[T]
 

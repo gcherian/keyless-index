@@ -48,6 +48,7 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
     val domains1: List[Domain] = List[Domain](putDomain11, new Domain("name-17"))
     rdd = rdd.multiput(domains1)
     val getDomain11: Domain = new Domain("name-11")
+    getDomain11.id = putDomain11.id
     val domain11 = rdd.get(getDomain11)
     rdd.foreach(d => println(d))
     assertResult(getDomain11.name)(domain11.name)
@@ -57,6 +58,25 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
 
   }
 
+  test("hier") {
 
+    val apartment: List[Room] = List[Room](new Room("1024", "1", 1, "blue", 700), new Room("1024", "2", 4, "red", 1500))
+    val building = KeylessRDD[Room, String](sc.parallelize(apartment), r => r.getId())
+    val complex = KeylessRDD[Room, String, String](sc.parallelize(building.getAll()), building.keyFunction, r => r.getFloor())
+    complex.foreach(r => println(r))
+  }
+
+
+
+}
+
+class Room(floor: String, id: String, noOfWindows: Int, color: String, area: Int) extends Serializable {
+  def getId(): String = {
+    id
+  }
+
+  def getFloor(): String = {
+    floor
+  }
 
 }

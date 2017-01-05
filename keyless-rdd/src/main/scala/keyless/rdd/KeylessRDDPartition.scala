@@ -16,6 +16,8 @@ private[keyless] abstract class KeylessRDDPartition[T] {
 
   def put(v: T)
 
+  def getAll(): List[T]
+
   def filter(pred: (T) => Boolean): KeylessRDDPartition[T]
 
   def multiget(ks: List[T]): Iterator[T]
