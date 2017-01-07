@@ -9,7 +9,7 @@ import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 
 /**
-  * Created by georg on 12/19/2016.
+  * Created by gcherian on 12/19/2016.
   */
 class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
 (private val partitionsRDD: RDD[KeylessRDDPartition[T]], val keyFunction: T => K, val indexFunction: T => I = null) extends RDD[T](partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
@@ -59,16 +59,16 @@ class KeylessRDD[T: ClassTag, K: ClassTag, I: ClassTag]
   }
 
   def getAll(): List[T] = {
-    val all: List[T] = List()
-    partitionsRDD.foreachPartition(partIter => {
+    val results: Array[Array[T]] = context.runJob(partitionsRDD, (context: TaskContext, partIter: Iterator[KeylessRDDPartition[T]]) => {
       if (partIter.hasNext) {
         val part = partIter.next()
-        all ::: (part.getAll())
+        part.iterator.toArray
+      } else {
+        Array.empty
       }
-    }
+    })
 
-    )
-    all
+    results.flatten.toList
 
   }
 

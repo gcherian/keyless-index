@@ -8,7 +8,7 @@ import collection.JavaConversions._
 import scala.reflect.ClassTag
 
 /**
-  * Created by georg on 12/23/2016.
+  * Created by gcherian on 12/23/2016.
   */
 
 
@@ -33,8 +33,6 @@ class KeylessRDDPartitionImpl[T: ClassTag, K: ClassTag, I: ClassTag]
   override def size: Long = index.size()
 
   override def iterator: Iterator[T] = index.iterator()
-
-  override def getAll: List[T] = index.iterator().toList
 
   override def get(v: T): T = index.get(v).asInstanceOf[T]
 

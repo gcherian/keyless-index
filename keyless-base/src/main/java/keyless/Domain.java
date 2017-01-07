@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 /**
- * Created by georg on 10/17/2016.
+ * Created by gcherian on 10/17/2016.
  */
 public class Domain implements Serializable {
     @Override

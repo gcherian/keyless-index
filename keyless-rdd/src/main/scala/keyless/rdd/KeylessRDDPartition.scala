@@ -3,7 +3,7 @@ package keyless.rdd
 import scala.reflect.ClassTag
 
 /**
-  * Created by georg on 12/19/2016.
+  * Created by gcherian on 12/19/2016.
   */
 private[keyless] abstract class KeylessRDDPartition[T] {
 
@@ -15,8 +15,6 @@ private[keyless] abstract class KeylessRDDPartition[T] {
   def get(v: T): T
 
   def put(v: T)
-
-  def getAll(): List[T]
 
   def filter(pred: (T) => Boolean): KeylessRDDPartition[T]
 

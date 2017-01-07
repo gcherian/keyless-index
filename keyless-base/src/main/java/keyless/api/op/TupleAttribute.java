@@ -5,7 +5,7 @@ import keyless.api.Attribute;
 import keyless.api.Operation;
 
 /**
- * Created by georg on 1/28/2016.
+ * Created by gcherian on 1/28/2016.
  */
 public class TupleAttribute<O, A> implements Attribute<O, A> {
 

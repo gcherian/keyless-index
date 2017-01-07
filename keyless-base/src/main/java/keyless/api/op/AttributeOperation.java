@@ -4,7 +4,7 @@ package keyless.api.op;
 import keyless.api.Operation;
 
 /**
- * Created by georg on 1/28/2016.
+ * Created by gcherian on 1/28/2016.
  */
 public class AttributeOperation implements Operation {
     public AttributeOperation(Object left, Object right, Operator op) {

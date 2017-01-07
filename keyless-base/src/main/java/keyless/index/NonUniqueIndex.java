@@ -4,11 +4,12 @@ import keyless.api.Hashable;
 import keyless.api.hash.HashableFunction;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Created by georg on 1/28/2016.
+ * Created by gcherian on 1/28/2016.
  */
 public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
     private Hashable indexStrategy = null;
@@ -140,21 +141,71 @@ public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
         return new MultiValueIterator<T>();
     }
 
-    protected class MultiValueIterator<T> extends ValueIterator<T> {
+    class MultiValueIterator<T> implements Iterator<T> {
+        FullUniqueIndex<T> nextList = null;
+        Iterator<T> nextIterator = null;
+
+        int cursor = 0;
+        int lastRet = -1;
+
+
+        public boolean hasNext() {
+            boolean hasValue = false;
+            for (int i = cursor; i < _set.length; i++) {
+                if (_set[i] != FREE && _set[i] != REMOVED) hasValue = true;
+            }
+            return (nextList != null && nextIterator.hasNext()) || (hasValue && cursor < _set.length);
+        }
+
+
         @Override
         public T next() {
             T next = null;
-            do {
-                next = nextInner();
-            } while (hasNext() && (next == null || next == FREE || next == REMOVED));
-            if (next != FREE && next != REMOVED) {
-                if (next instanceof FullUniqueIndex) {
-                    return (T) ((FullUniqueIndex) next).getFirst();
+            if (nextList != null && nextIterator != null) {
+                if (nextIterator.hasNext())
+                    next = nextIterator.next();
+                else {
+                    nextList = null;
+                    nextIterator = null;
                 }
-                return next;
+            }
 
-            } else return null;
+            if (next == null) {
+                do {
+                    next = nextInner();
+                } while (hasNext() && (next == null || next == FREE || next == REMOVED));
+                if (next != FREE && next != REMOVED) {
+                    if (next instanceof FullUniqueIndex) {
+                        if (nextList == null) {
+                            nextList = (FullUniqueIndex<T>) next;
+                            nextIterator = nextList.iterator();
+                            next = nextIterator.next();
+                        }
+
+                    } else return next;
+
+                } else return null;
+
+            }
+            return next;
         }
+
+        protected T nextInner() {
+            try {
+                int i = cursor;
+                T next = (T) _set[i];
+                lastRet = i;
+                cursor = i + 1;
+                return next;
+            } catch (IndexOutOfBoundsException e) {
+                throw new NoSuchElementException();
+            }
+        }
+
+        public void remove() {
+            throw new RuntimeException("Index cannot be modified using iterators.");
+        }
+
     }
 
 }

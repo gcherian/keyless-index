@@ -5,7 +5,7 @@ import keyless.api.Hashable;
 import java.util.function.Function;
 
 /**
- * Created by georg on 1/26/2016.
+ * Created by gcherian on 1/26/2016.
  */
 public class HashableFunction<T> implements Hashable<T> {
 

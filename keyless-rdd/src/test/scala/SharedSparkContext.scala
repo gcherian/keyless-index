@@ -1,5 +1,5 @@
 /**
-  * Created by georg on 12/26/2016.
+  * Created by gcherian on 12/26/2016.
   */
 
 import org.apache.spark.SparkConf

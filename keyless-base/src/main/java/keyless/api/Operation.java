@@ -3,7 +3,7 @@ package keyless.api;
 import keyless.api.op.Operator;
 
 /**
- * Created by georg on 1/28/2016.
+ * Created by gcherian on 1/28/2016.
  */
 public interface Operation {
     public Operation or(Operation op);

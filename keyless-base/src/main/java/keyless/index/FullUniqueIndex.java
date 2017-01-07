@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Created by georg on 1/26/2016.
+ * Created by gcherian on 1/26/2016.
  */
 public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
 
