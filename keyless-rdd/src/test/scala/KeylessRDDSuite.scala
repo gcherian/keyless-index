@@ -43,8 +43,9 @@ class KeylessRDDSuite extends FunSuite with SharedSparkContext {
   }
 
   test("nui") {
+    Thread.sleep(5000)
 
-    var rdd = createNui(sc.parallelize((0 to 100).map(x => (new Domain("name-" + x % 10))), 10))
+    var rdd = createNui(sc.parallelize((0 to 1000).map(x => (new Domain("name-" + x % 10))), 10))
     val putDomain11: Domain = new Domain("name-11")
     val domains1: List[Domain] = List[Domain](putDomain11, new Domain("name-17"))
     rdd = rdd.multiput(domains1)
