@@ -43,11 +43,11 @@ If the maintenance has to be done per floor, we would need to group by floorId (
  
 Also considering the types that we used in the list are defined at the compile time, it is not posssible to have different groupings at the runtime without having different compile time structures. For example, if we have to have rooms grouped by name instead of floor, we would need a different data structure and different code to populate this.
 
-Now imagine, we need to have a tower of floors, each floor of houses and houses with rooms. The tower is grouped by floor, the floor by house and house by rooms.
+Now imagine, we need to have a tower of floors, each floor of houses and houses with rooms. The tower is grouped by floor, the floor by house and house by rooms. We soon see the datastructure geting complicated to navigate and maintain.
 
     List<Room> house = new ArrayList<>();
     Map<Int,List<Room>> floor = new HashMap<>();
-    Map<Int<Map<Int,List<Room>>> apartment = new HashMap<>();
+    Map<Int<Map<Int,List<Room>>> tower = new HashMap<>();
     
 ### Solution (How)
 We propose the idea of not having a key, instead have a key extractor lambda as a parameter to constructing the data structure. This way the key is derived from the value. This uses open hashing with linear probing for efficient lookups using an index using an efficient and deterministic hash function.
