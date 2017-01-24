@@ -1,7 +1,27 @@
 Keyless Index
 ------------------------------
 
-This is a list data structure, which has all the inherent features of a map, or a multimap.
+This is a list/set data structure, which has all the inherent features of a map, or a multimap so that it can be used as a generic datastructure for all collections with one or many values.
+
+### Usage 
+
+NonUniqueIndex nui = new NonUniqueIndex(Person::getId,Person::getName)
+Person george1 = new Person(1,"George")
+Person george2 = new Person(2,"George")
+Person cherian = new Person(3,"Cherian")
+
+nui.put(george1)
+nui.put(george2)
+nui.put(cherian)
+
++----------------+
+| george1|george2|
++----------------+
+|     cherian    |
++----------------+
+
+FullUniqueIndex fui = nui.get(george1)
+Person george2 = fui.get(george2)
 
 
 ### Problem (Why)
