@@ -15,7 +15,12 @@ import java.util.function.Predicate;
  */
 public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
 
+    public Hashable getStrategy() {
+        return strategy;
+    }
+
     protected final Hashable strategy;
+
 
     public FullUniqueIndex(Hashable strategy) {
         this.strategy = strategy;
@@ -26,7 +31,7 @@ public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
         setUp(capacity);
     }
 
-    public FullUniqueIndex(Function... functions) {
+    public FullUniqueIndex(Function<T, ?>... functions) {
         this.strategy = new HashableFunction<>(functions);
     }
 
@@ -53,7 +58,16 @@ public class FullUniqueIndex<T> extends TObjectHash<T> implements Index<T> {
 
     @Override
     public boolean foreach(Procedure proc) {
-        return false;
+        Iterator<T> it = iterator();
+        while (it.hasNext()) {
+            T each = it.next();
+            if (proc.execute(each)) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
