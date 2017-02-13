@@ -1,6 +1,7 @@
 package keyless.index;
 
 import keyless.api.Hashable;
+import keyless.api.Procedure;
 import keyless.api.hash.HashableFunction;
 
 import java.util.Iterator;
@@ -134,6 +135,17 @@ public class NonUniqueIndex<T> extends FullUniqueIndex<T> implements Index<T> {
 
     protected int buildHash(Object obj) {
         return indexStrategy.hashCode(obj);
+    }
+
+    public boolean forEachGroup(Procedure proc) {
+        boolean todo = true;
+        for (int i = 0; i < _set.length && todo; i++) {
+            if (_set[i] != FREE && _set[i] != REMOVED) {
+                Object each = _set[i];
+                todo = proc.execute(each);
+            }
+        }
+        return todo;
     }
 
     @Override
