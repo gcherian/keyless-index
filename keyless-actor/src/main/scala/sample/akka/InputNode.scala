@@ -4,19 +4,18 @@ package sample.akka
   * Created by gcherian on 1/15/2017.
   */
 
-import Node.{NodeMessage, Input}
-import akka.typed.{Behavior, ActorRef, Props}
 import akka.typed.ScalaDSL._
-import HasOutputs._
+import akka.typed.{ActorRef, Behavior, Props}
+import keyless.actor.node._
 
-object InputNode {
+object InputNode extends Node[Double] {
 
   def props() = Props(receive)
 
-  def receive = addOutput(run, Seq())
+  def receive = NodeOutputs.addOutput(run, Seq())
 
-  def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Input]]): Behavior[NodeMessage] = Partial[NodeMessage] {
-    case i: Input =>
+  def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Input[_]]]): Behavior[NodeMessage] = Partial[NodeMessage] {
+    case i: Input[_] =>
       outputs.foreach(_ ! i)
       run(inputs, outputs)
   }
