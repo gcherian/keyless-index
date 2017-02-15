@@ -11,6 +11,7 @@
     <modules>
         <module>keyless-base</module>
         <module>keyless-rdd</module>
+        <module>keyless-actor</module>
     </modules>
 
     <properties>
