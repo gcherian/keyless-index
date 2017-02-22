@@ -32,11 +32,27 @@ class Edge[M: ClassTag] extends Node[M] {
     }
   }
 
+
+
+
 }
-
-
 case class EdgeInputMessage(input: ActorRef[Nothing], replyTo: ActorRef[Ack.type]) extends EdgeMessage
 
 case class EdgeOutputMessage(output: ActorRef[WeightedInput[_]], replyTo: ActorRef[Ack.type]) extends EdgeMessage
 
 case class UpdateWeight(weight: Double) extends EdgeMessage
+
+object EdgeNode extends Edge[Double] {
+  def props() = Props(receive)
+
+  def receive = EdgeInputs.addInput(EdgeOutputs.addOutput(run(_, _, 0.3), _))
+
+  def run(input: ActorRef[Nothing], output: ActorRef[WeightedInput[_]], weight: Double): Behavior[EdgeMessage] = Partial[EdgeMessage] {
+    case Input(f) =>
+      output ! WeightedInput(f, weight)
+      run(input, output, weight)
+
+    case UpdateWeight(newWeight) =>
+      run(input, output, newWeight)
+  }
+}

@@ -1,4 +1,4 @@
-package sample.akka
+package neural.net
 
 /**
   * Created by gcherian on 1/15/2017.
@@ -112,7 +112,7 @@ object Main extends App {
           Await.result(printer ? (NodeInputMessage(Seq(edgeo1p1), _: ack)), d)
 
           var i = 0
-          scala.io.Source.fromFile("C:\\Users\\georg\\IdeaProjects\\keyless-index\\keyless-actor\\src\\main\\resources\\data.csv")
+          scala.io.Source.fromFile("/Users/george.cherian/IdeaProjects/keyless-index/keyless-actor/src/main/resources/data.csv")//TODO Read from Classpath
             .getLines()
             .foreach { l =>
               val splits = l.split(",")

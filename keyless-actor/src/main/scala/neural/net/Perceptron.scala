@@ -1,4 +1,4 @@
-package sample.akka
+package neural.net
 
 /**
   * Created by gcherian on 1/15/2017.
@@ -8,12 +8,12 @@ import keyless.actor.node._
 import akka.typed.{Behavior, ActorRef, Props}
 import akka.typed.ScalaDSL._
 
-object Perceptron extends Edge[Double] {
+class Perceptron extends Edge[Double] {
 
 
   import Neuron._
 
-  def props() = Props(behaviour)
+
 
   def behaviour = NodeInputs.addInput(NodeOutputs.addOutput(feedForward(_, _, 0.2, sigmoid, Vector(), Vector()), _))
 
@@ -45,4 +45,11 @@ object Perceptron extends Edge[Double] {
     case UpdateBias(newBias) =>
       feedForward(inputs, outputs, newBias, activationFunction, weightsT, featuresT)
   }
+
+
+}
+
+object Perceptron {
+  val perceptron:Perceptron = new Perceptron
+  def props() = Props(perceptron.behaviour)
 }

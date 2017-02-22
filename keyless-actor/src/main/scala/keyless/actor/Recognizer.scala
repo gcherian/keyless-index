@@ -2,13 +2,14 @@ package keyless.actor
 
 import akka.actor.Actor
 import keyless.index.FullUniqueIndex
+import neural.net.Perceptron
 
 import scala.reflect.ClassTag
 
 /**
   * Created by gcherian on 1/16/2017.
   */
-class Recognizer[P: ClassTag](val name: String) extends Actor {
+class Recognizer[P: ClassTag](val name: String) extends Perceptron {
 
   import java.util.function.{Function => JFunction, Predicate => JPredicate}
 
@@ -26,9 +27,7 @@ class Recognizer[P: ClassTag](val name: String) extends Actor {
   val children: FullUniqueIndex[Recognizer[_]] = new FullUniqueIndex[Recognizer[_]]((r: Recognizer[_]) => r.name)
   val memory: FullUniqueIndex[P] = new FullUniqueIndex[P]()
 
-  override def receive = {
-    case message => println("Received Message " + message)
-  }
+
 
 
 }

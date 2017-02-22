@@ -1,4 +1,4 @@
-package sample.akka
+package neural.net
 
 /**
   * Created by gcherian on 1/15/2017.

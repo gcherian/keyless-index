@@ -4,8 +4,11 @@ package keyless.actor.node
   * Created by gcherian on 1/15/2017.
   */
 
+import java.text.SimpleDateFormat
+import java.util.Date
+
 import akka.typed.ScalaDSL._
-import akka.typed.{ActorRef, Behavior}
+import akka.typed.{ActorRef, Behavior, Props}
 
 import scala.reflect.ClassTag
 
@@ -28,6 +31,36 @@ class Node[M: ClassTag] {
     }
   }
 
+}
+
+object InputNode extends Node[Double] {
+
+  def props() = Props(receive)
+
+  def receive = NodeOutputs.addOutput(run, Seq())
+
+  def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Input[_]]]): Behavior[NodeMessage] = Partial[NodeMessage] {
+    case i: Input[_] =>
+      outputs.foreach(_ ! i)
+      run(inputs, outputs)
+  }
+}
+
+object OutputNode extends Node[Double] {
+
+
+  def props() = Props(receive)
+
+  val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+
+  def receive = NodeInputs.addInput(run(_, 0))
+
+  def run(inputs: Seq[ActorRef[Nothing]], i: Int): Behavior[NodeMessage] = Partial[NodeMessage] {
+    case WeightedInput(f, _) =>
+      val time = new Date(System.currentTimeMillis())
+      println(s"Input $i with result $f in ${format.format(time)}")
+      run(inputs, i + 1)
+  }
 }
 
 trait NodeMessage
