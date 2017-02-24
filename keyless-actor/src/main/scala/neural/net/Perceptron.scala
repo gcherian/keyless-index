@@ -8,14 +8,14 @@ import keyless.actor.node._
 import akka.typed.{Behavior, ActorRef, Props}
 import akka.typed.ScalaDSL._
 
-class Perceptron extends Edge[Double] {
+class Perceptron extends Synapse[Double] {
 
 
-  import Neuron._
+  import ActiivationFunctions._
 
 
 
-  def behaviour = NodeInputs.addInput(NodeOutputs.addOutput(feedForward(_, _, 0.2, sigmoid, Vector(), Vector()), _))
+  def behaviour = Dendrites.addInput(Axons.addOutput(feedForward(_, _, 0.2, sigmoid, Vector(), Vector()), _))
 
   private def allInputsAvailable(w: Vector[Double], f: Vector[Double], in: Seq[ActorRef[Nothing]]) =
     w.length == in.length && f.length == in.length
@@ -26,7 +26,7 @@ class Perceptron extends Edge[Double] {
                    bias: Double,
                    activationFunction: Double => Double,
                    weightsT: Vector[Double],
-                   featuresT: Vector[Double]): Behavior[NodeMessage] = Partial[NodeMessage] {
+                   featuresT: Vector[Double]): Behavior[NeuronSignal] = Partial[NeuronSignal] {
 
     case WeightedInput(f: Double, w: Double) =>
       val featuresTplusOne = featuresT :+ f

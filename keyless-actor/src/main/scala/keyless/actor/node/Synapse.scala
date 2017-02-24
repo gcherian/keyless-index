@@ -11,22 +11,22 @@ import scala.reflect.ClassTag
   */
 
 
-class Edge[M: ClassTag] extends Node[M] {
+class Synapse[M: ClassTag] extends Neuron[M] {
 
 
-  object EdgeInputs {
+  object Dendrite {
     def addInput[T](behavior: ActorRef[Nothing] => Behavior[T]) = Partial[T] {
-      case EdgeInputMessage(i, r) =>
+      case SynapseInputSignal(i, r) =>
         r ! Ack
         behavior(i)
     }
   }
 
-  object EdgeOutputs {
+  object Axon {
 
 
     def addOutput[T](behavior: (ActorRef[Nothing], ActorRef[WeightedInput[_]]) => Behavior[T], input: ActorRef[Nothing]) = Partial[T] {
-      case EdgeOutputMessage(o, r) =>
+      case SynapseOutputSignal(o, r) =>
         r ! Ack
         behavior(input, o)
     }
@@ -36,18 +36,18 @@ class Edge[M: ClassTag] extends Node[M] {
 
 
 }
-case class EdgeInputMessage(input: ActorRef[Nothing], replyTo: ActorRef[Ack.type]) extends EdgeMessage
+case class SynapseInputSignal(input: ActorRef[Nothing], replyTo: ActorRef[Ack.type]) extends SynapseSignal
 
-case class EdgeOutputMessage(output: ActorRef[WeightedInput[_]], replyTo: ActorRef[Ack.type]) extends EdgeMessage
+case class SynapseOutputSignal(output: ActorRef[WeightedInput[_]], replyTo: ActorRef[Ack.type]) extends SynapseSignal
 
-case class UpdateWeight(weight: Double) extends EdgeMessage
+case class UpdateWeight(weight: Double) extends SynapseSignal
 
-object EdgeNode extends Edge[Double] {
+object SynapseTerminal extends Synapse[Double] {
   def props() = Props(receive)
 
-  def receive = EdgeInputs.addInput(EdgeOutputs.addOutput(run(_, _, 0.3), _))
+  def receive = Dendrite.addInput(Axon.addOutput(run(_, _, 0.3), _))
 
-  def run(input: ActorRef[Nothing], output: ActorRef[WeightedInput[_]], weight: Double): Behavior[EdgeMessage] = Partial[EdgeMessage] {
+  def run(input: ActorRef[Nothing], output: ActorRef[WeightedInput[_]], weight: Double): Behavior[SynapseSignal] = Partial[SynapseSignal] {
     case Input(f) =>
       output ! WeightedInput(f, weight)
       run(input, output, weight)

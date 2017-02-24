@@ -1,15 +1,15 @@
 package keyless.actor
 
 import akka.actor.Actor
+import keyless.actor.node.Neuron
 import keyless.index.FullUniqueIndex
-import neural.net.Perceptron
 
 import scala.reflect.ClassTag
 
 /**
   * Created by gcherian on 1/16/2017.
   */
-class Recognizer[P: ClassTag](val name: String) extends Perceptron {
+class Recognizer[P: ClassTag](val name: String) extends Neuron {
 
   import java.util.function.{Function => JFunction, Predicate => JPredicate}
 
