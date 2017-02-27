@@ -15,7 +15,7 @@ class Perceptron extends Synapse[Double] {
 
 
 
-  def behaviour = Dendrites.addInput(Axons.addOutput(feedForward(_, _, 0.2, sigmoid, Vector(), Vector()), _))
+  def behaviour = Dendrites.addInputs(Axons.addOutputs(feedForward(_, _, 0.2, sigmoid, Vector(), Vector()), _))
 
   private def allInputsAvailable(w: Vector[Double], f: Vector[Double], in: Seq[ActorRef[Nothing]]) =
     w.length == in.length && f.length == in.length

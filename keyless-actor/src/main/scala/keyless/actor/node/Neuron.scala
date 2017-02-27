@@ -16,7 +16,7 @@ class Neuron[M: ClassTag] {
 
 
   object Dendrites {
-    def addInput[T](behavior: Seq[ActorRef[Nothing]] => Behavior[T]) = Partial[T] {
+    def addInputs[T](behavior: Seq[ActorRef[Nothing]] => Behavior[T]) = Partial[T] {
       case NeuronInputSignal(i, r) =>
         r ! Ack
         behavior(i)
@@ -24,7 +24,7 @@ class Neuron[M: ClassTag] {
   }
 
   object Axons {
-    def addOutput[T](behavior: (Seq[ActorRef[Nothing]], Seq[ActorRef[Input[_]]]) => Behavior[T], inputs: Seq[ActorRef[Nothing]]) = Partial[T] {
+    def addOutputs[T](behavior: (Seq[ActorRef[Nothing]], Seq[ActorRef[Input[_]]]) => Behavior[T], inputs: Seq[ActorRef[Nothing]]) = Partial[T] {
       case NeuronOutputSignal(o, r) =>
         r ! Ack
         behavior(inputs, o)
@@ -37,7 +37,7 @@ object InputNeuron extends Neuron[Double] {
 
   def props() = Props(receive)
 
-  def receive = Axons.addOutput(run, Seq())
+  def receive = Axons.addOutputs(run, Seq())
 
   def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Input[_]]]): Behavior[NeuronSignal] = Partial[NeuronSignal] {
     case i: Input[_] =>
@@ -53,7 +53,7 @@ object OutputNeuron extends Neuron[Double] {
 
   val format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 
-  def receive = Dendrites.addInput(run(_, 0))
+  def receive = Dendrites.addInputs(run(_, 0))
 
   def run(inputs: Seq[ActorRef[Nothing]], i: Int): Behavior[NeuronSignal] = Partial[NeuronSignal] {
     case WeightedInput(f, _) =>
