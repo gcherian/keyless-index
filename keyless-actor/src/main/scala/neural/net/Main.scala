@@ -20,7 +20,7 @@ object Main extends App {
   override def main(params: Array[String]) = {
 
     val inputs =params(0).toInt
-    val layers =if (params(1) != null) params(1).toInt else 3
+    val layers =if (params(1) != null) params(1).toInt else 2
 
     val main: Behavior[Unit] =
       Full {
@@ -29,7 +29,9 @@ object Main extends App {
           //Neurons
 
           val inputLayers: Array[ActorRef[NeuronSignal]] = Array.ofDim(inputs)
-          for ( i<- 0 to inputs-1) {inputLayers(i)=context.spawn(InputNeuron.props(),"InputLayer"+i)}
+          for ( i<- 0 to inputs-1) {
+            inputLayers(i)=context.spawn(InputNeuron.props(),"InputLayer"+i)
+          }
 
           val hiddenLayers: Array[Array[ActorRef[NeuronSignal]]] = Array.ofDim(layers, inputs)
           for (i <- 0 to layers-1)
@@ -47,20 +49,22 @@ object Main extends App {
           for (i <- 0 to layers-1)
             for (j<-0 to inputs-1)
               for (k <- 0 to inputs-1) {
-                synapses(i)(j)(k)=context.spawn(SynapseTerminal.props(),"SynapseHidden"+i+"_"+j+"_"+k)
+                synapses(i)(j)(k)=context.spawn(SynapseTerminal.props(),"HiddenSynapse"+i+":"+j+":"+k)
               }
 
           val outputSynapses:Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
           for (i <- 0 to inputs-1)
-            outputSynapses(i) = context.spawn(SynapseTerminal.props(),"SynapseOutput"+i)
+            outputSynapses(i) = context.spawn(SynapseTerminal.props(),"OutputSynapse"+i)
 
-          val printerSynapse = context.spawn(SynapseTerminal.props(), "SynapsePrinter")
+          val printerSynapse = context.spawn(SynapseTerminal.props(), "PrinterSynapse")
 
 
-          implicit val t = Timeout(20 seconds)
+          implicit val t = Timeout(10 seconds)
           val d = t.duration
 
           type ack = ActorRef[Ack.type]
+
+          //Wiring Synapses
 
           for (i <-0 to layers-1)
             for (j <- 0 to inputs-1)
@@ -79,50 +83,40 @@ object Main extends App {
           Await.result(printerSynapse ? (SynapseInputSignal(outputLayer,_:ack)),d)
           Await.result(printerSynapse ? (SynapseOutputSignal(printerLayer, _: ack)), d)
 
-
+          //Wiring Neurons
 
           for (i <- 0 to inputs-1){
-            val connections: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
+            val inputSequences: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
             for (j <- 0 to inputs-1)
-              connections(j)=synapses(0)(i)(j)
-            val outputSignal = NeuronOutputSignal(connections, _: ack)
-            Await.result(inputLayers(i)? outputSignal,d)
+              inputSequences(j)=synapses(0)(i)(j)
+            Await.result(inputLayers(i) ? (NeuronOutputSignal(inputSequences, _: ack)),d)
           }
 
 
 
-          for (i <- 1 to layers-2)
+          for (i <- 0 to layers-2)
             for (j <- 0 to inputs-1) {
 
-              val forwardConnections: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
+              val hiddenInputSequence: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
 
-              val backwardConnections: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
+              val hiddenOutputSequence: Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
 
               for (k <- 0 to inputs-1) {
-                forwardConnections(k)=synapses(i)(j)(k)
-                backwardConnections(k)=synapses(i+1)(j)(k)
+                hiddenInputSequence(k)=synapses(i)(j)(k)
+                hiddenOutputSequence(k)=synapses(i+1)(j)(k)
 
               }
-              val synapseInputSignal = NeuronInputSignal(forwardConnections, _: ack)
-              val synapseOutputSignal = NeuronOutputSignal(backwardConnections, _: ack)
 
-              Await.result(hiddenLayers(i)(j)?synapseInputSignal,d)
-              Await.result(hiddenLayers(i)(j)? synapseOutputSignal,d)
+
+              Await.result(hiddenLayers(i)(j)?(NeuronInputSignal(hiddenInputSequence, _: ack)),d)
+              Await.result(hiddenLayers(i)(j)? (NeuronOutputSignal(hiddenOutputSequence, _: ack)),d)
             }
 
 
-          for (i <-0 to inputs-1 ) {
-            val outputConnections: Array[ActorRef[NeuronSignal]] = Array.ofDim(inputs)
 
-            for (k <- 0 to inputs-1)
-              outputConnections(k) = hiddenLayers(layers-1)(k)
+            val neuronOutputSignal = NeuronInputSignal(outputSynapses, _: ack)
 
-            val neuronOutputSignal = NeuronInputSignal(outputConnections, _: ack)
-            Await.result(outputLayer?neuronOutputSignal,d)
-
-
-          }
-
+          Await.result(outputLayer?neuronOutputSignal,d)
           Await.result(printerLayer ? (NeuronInputSignal(Seq(printerSynapse), _: ack)), d)
 
           var i = 0
@@ -131,13 +125,12 @@ object Main extends App {
             .foreach { l =>
               val splits = l.split(",")
               
-              for (i <- 0 to inputs) {
+              for (i <- 0 to inputs-1) {
                 inputLayers(i) ! Input(splits(i).toDouble)
               }
 
+              i=i+1
 
-
-              i = i + 1
             }
 
           Same
