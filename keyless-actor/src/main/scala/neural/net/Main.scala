@@ -13,6 +13,7 @@ import scala.concurrent.duration._
 import akka.typed._
 import akka.typed.ScalaDSL._
 import akka.typed.AskPattern._
+import keyless.actor.Recognizer
 
 object Main extends App {
 
@@ -36,11 +37,11 @@ object Main extends App {
           val hiddenLayers: Array[Array[ActorRef[NeuronSignal]]] = Array.ofDim(layers, inputs)
           for (i <- 0 to layers-1)
             for (j <- 0 to inputs-1) {
-              hiddenLayers(i)(j) = context.spawn(Perceptron.props(),"HiddenLayer"+i+"_"+j)
+              hiddenLayers(i)(j) = context.spawn(Recognizer.props(),"HiddenLayer"+i+"_"+j)
             }
 
 
-          val outputLayer = context.spawn(Perceptron.props(), "OutputLayer")
+          val outputLayer = context.spawn(Recognizer.props(), "OutputLayer")
 
           val printerLayer = context.spawn(OutputNeuron.props(), "Printer")
 
