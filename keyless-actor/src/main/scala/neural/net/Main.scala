@@ -5,6 +5,8 @@ package neural.net
   */
 
 
+import java.util.{Date, Random, UUID}
+
 import akka.util.Timeout
 import keyless.actor.node._
 
@@ -37,11 +39,11 @@ object Main extends App {
           val hiddenLayers: Array[Array[ActorRef[NeuronSignal]]] = Array.ofDim(layers, inputs)
           for (i <- 0 to layers-1)
             for (j <- 0 to inputs-1) {
-              hiddenLayers(i)(j) = context.spawn(Recognizer.props(),"HiddenLayer"+i+"_"+j)
+              hiddenLayers(i)(j) = context.spawn(Recognizer("HiddenLayer"+i+"_"+j).props(),"HiddenLayer"+i+"_"+j)
             }
 
 
-          val outputLayer = context.spawn(Recognizer.props(), "OutputLayer")
+          val outputLayer = context.spawn(Recognizer("OutputLayer").props(), "OutputLayer")
 
           val printerLayer = context.spawn(OutputNeuron.props(), "Printer")
 
@@ -50,14 +52,14 @@ object Main extends App {
           for (i <- 0 to layers-1)
             for (j<-0 to inputs-1)
               for (k <- 0 to inputs-1) {
-                synapses(i)(j)(k)=context.spawn(SynapseTerminal.props(),"HiddenSynapse"+i+":"+j+":"+k)
+                synapses(i)(j)(k)=context.spawn(HiddenSynapse.props(),"HiddenSynapse"+i+":"+j+":"+k)
               }
 
           val outputSynapses:Array[ActorRef[SynapseSignal]] = Array.ofDim(inputs)
           for (i <- 0 to inputs-1)
-            outputSynapses(i) = context.spawn(SynapseTerminal.props(),"OutputSynapse"+i)
+            outputSynapses(i) = context.spawn(HiddenSynapse.props(),"OutputSynapse"+i)
 
-          val printerSynapse = context.spawn(SynapseTerminal.props(), "PrinterSynapse")
+          val printerSynapse = context.spawn(HiddenSynapse.props(), "PrinterSynapse")
 
 
           implicit val t = Timeout(10 seconds)
@@ -125,13 +127,17 @@ object Main extends App {
             .getLines()
             .foreach { l =>
               val splits = l.split(",")
-              
-              for (i <- 0 to inputs-1) {
-                inputLayers(i) ! Input(splits(i).toDouble)
-              }
+
+              val who = new Random().nextInt(100)
+              val what = new Random().nextInt(10)
+              val when = new Random().nextInt(23)
+
+              inputLayers(0) ! Data(UUID.randomUUID().toString,who,splits(0).toDouble,0.7)
+              inputLayers(1) ! Data(UUID.randomUUID().toString,what,splits(1).toDouble,0.2)
+              inputLayers(2) ! Data(UUID.randomUUID().toString,when,splits(2).toDouble,0.1)
+
 
               i=i+1
-
             }
 
           Same

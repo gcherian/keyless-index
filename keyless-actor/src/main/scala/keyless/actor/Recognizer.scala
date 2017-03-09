@@ -3,14 +3,15 @@ package keyless.actor
 import akka.typed.ScalaDSL.Partial
 import akka.typed.{ActorRef, Behavior, Props}
 import keyless.actor.node._
-import keyless.index.FullUniqueIndex
-import neural.net.{ActiivationFunctions}
+import keyless.index.{FullUniqueIndex, NonUniqueIndex}
+import neural.net.ActiivationFunctions
+
 import scala.reflect.ClassTag
 
 /**
   * Created by gcherian on 1/16/2017.
   */
-class Recognizer[P: ClassTag](val name: String) extends Synapse {
+class Recognizer(val name: String) extends Synapse {
 
   import ActiivationFunctions._
 
@@ -23,20 +24,26 @@ class Recognizer[P: ClassTag](val name: String) extends Synapse {
 
   def feedForward(
                    inputs: Seq[ActorRef[Nothing]],
-                   outputs: Seq[ActorRef[Input[Double]]],
+                   outputs: Seq[ActorRef[Data]],
                    bias: Double,
                    activationFunction: Double => Double,
                    weights: Vector[Double],
                    features: Vector[Double]): Behavior[NeuronSignal] = Partial[NeuronSignal] {
 
-    case WeightedInput(f: Double, w: Double) =>
+    case Data(id,di,f: Double, w: Double) =>
+
+
+      val data = new Data(id, di, f, w)
+
+      memory.put(data)
+
       val featureGroup = features :+ f
       val weightGroup = weights :+ w
 
       if (allInputsAvailable(featureGroup, weightGroup, inputs)) {
         val activation = activationFunction(weightGroup.zip(featureGroup).map(x => x._1 * x._2).sum + bias)
-        println(s"Activation $activation using features $featureGroup")
-        outputs.foreach(_ ! Input[Double](activation))
+        println(s"Activation $activation using features $featureGroup for Data : $id $di $f $w")
+        outputs.foreach(_ ! Data(id,di,activation,w))
 
         feedForward(inputs, outputs, bias, activationFunction, Vector(), Vector())
       } else {
@@ -60,12 +67,18 @@ class Recognizer[P: ClassTag](val name: String) extends Synapse {
   }
 
 
-  val memory: FullUniqueIndex[P] = new FullUniqueIndex[P]()
+  val memory:NonUniqueIndex[Data] = new NonUniqueIndex[Data]((d:Data)=>d.id,(d:Data)=>d.dimension)
 
+  def props()= Props(behaviour)
 
 }
 
 object Recognizer {
-  val recognizer = new Recognizer[Double]("Base")
-  def props()= Props(recognizer.behaviour)
+  def apply(name:String) = {
+    new Recognizer(name)
+  }
+
+
 }
+
+

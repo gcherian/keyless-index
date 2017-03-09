@@ -12,7 +12,7 @@ import akka.typed.{ActorRef, Behavior, Props}
 
 import scala.reflect.ClassTag
 
-class Neuron[M: ClassTag] {
+class Neuron {
 
 
   object Dendrites {
@@ -24,7 +24,7 @@ class Neuron[M: ClassTag] {
   }
 
   object Axons {
-    def addOutputs[T](behavior: (Seq[ActorRef[Nothing]], Seq[ActorRef[Input[_]]]) => Behavior[T], inputs: Seq[ActorRef[Nothing]]) = Partial[T] {
+    def addOutputs[T](behavior: (Seq[ActorRef[Nothing]], Seq[ActorRef[Data]]) => Behavior[T], inputs: Seq[ActorRef[Nothing]]) = Partial[T] {
       case NeuronOutputSignal(o, r) =>
         r ! Ack
         behavior(inputs, o)
@@ -33,20 +33,20 @@ class Neuron[M: ClassTag] {
 
 }
 
-object InputNeuron extends Neuron[Double] {
+object InputNeuron extends Neuron {
 
   def props() = Props(receive)
 
   def receive = Axons.addOutputs(run, Seq())
 
-  def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Input[_]]]): Behavior[NeuronSignal] = Partial[NeuronSignal] {
-    case i: Input[_] =>
+  def run(inputs: Seq[ActorRef[Nothing]], outputs: Seq[ActorRef[Data]]): Behavior[NeuronSignal] = Partial[NeuronSignal] {
+    case i: Data =>
       outputs.foreach(_ ! i)
       run(inputs, outputs)
   }
 }
 
-object OutputNeuron extends Neuron[Double] {
+object OutputNeuron extends Neuron {
 
 
   def props() = Props(receive)
@@ -56,7 +56,7 @@ object OutputNeuron extends Neuron[Double] {
   def receive = Dendrites.addInputs(run(_, 0))
 
   def run(inputs: Seq[ActorRef[Nothing]], i: Int): Behavior[NeuronSignal] = Partial[NeuronSignal] {
-    case WeightedInput(f, _) =>
+    case Data(_,_,f, _) =>
       val time = new Date(System.currentTimeMillis())
       println(s"Input $i with result $f in ${format.format(time)}")
       run(inputs, i + 1)
@@ -69,16 +69,13 @@ trait SynapseSignal
 
 case object Ack
 
-case class Input[M: ClassTag](feature: M) extends NeuronSignal with SynapseSignal
-
-case class WeightedInput[M: ClassTag](feature: M, weight: Double) extends NeuronSignal
+case class  Data(id:String, dimension:Int, feature:Double, weight:Double) extends NeuronSignal with SynapseSignal
 
 case class UpdateBias(bias: Double) extends NeuronSignal
 
-
 case class NeuronInputSignal(inputs: Seq[ActorRef[Nothing]], replyTo: ActorRef[Ack.type]) extends NeuronSignal
 
-case class NeuronOutputSignal(outputs: Seq[ActorRef[Input[_]]], replyTo: ActorRef[Ack.type]) extends NeuronSignal
+case class NeuronOutputSignal(outputs: Seq[ActorRef[Data]], replyTo: ActorRef[Ack.type]) extends NeuronSignal
 
 
 

@@ -3,15 +3,13 @@ package keyless.actor.node
 import akka.typed.ScalaDSL.Partial
 import akka.typed.{ActorRef, Behavior, Props}
 
-import scala.reflect.ClassTag
-
 
 /**
   * Created by gcherian on 1/15/2017.
   */
 
 
-class Synapse[M: ClassTag] extends Neuron[M] {
+class Synapse extends Neuron {
 
 
   object Dendrite {
@@ -25,7 +23,7 @@ class Synapse[M: ClassTag] extends Neuron[M] {
   object Axon {
 
 
-    def addOutput[T](behavior: (ActorRef[Nothing], ActorRef[WeightedInput[_]]) => Behavior[T], input: ActorRef[Nothing]) = Partial[T] {
+    def addOutput[T](behavior: (ActorRef[Nothing], ActorRef[Data]) => Behavior[T], input: ActorRef[Nothing]) = Partial[T] {
       case SynapseOutputSignal(o, r) =>
         r ! Ack
         behavior(input, o)
@@ -38,18 +36,18 @@ class Synapse[M: ClassTag] extends Neuron[M] {
 }
 case class SynapseInputSignal(input: ActorRef[Nothing], replyTo: ActorRef[Ack.type]) extends SynapseSignal
 
-case class SynapseOutputSignal(output: ActorRef[WeightedInput[_]], replyTo: ActorRef[Ack.type]) extends SynapseSignal
+case class SynapseOutputSignal(output: ActorRef[Data], replyTo: ActorRef[Ack.type]) extends SynapseSignal
 
 case class UpdateWeight(weight: Double) extends SynapseSignal
 
-object SynapseTerminal extends Synapse[Double] {
+object HiddenSynapse extends Synapse {
   def props() = Props(receive)
 
   def receive = Dendrite.addInput(Axon.addOutput(run(_, _, 0.3), _))
 
-  def run(input: ActorRef[Nothing], output: ActorRef[WeightedInput[_]], weight: Double): Behavior[SynapseSignal] = Partial[SynapseSignal] {
-    case Input(f) =>
-      output ! WeightedInput(f, weight)
+  def run(input: ActorRef[Nothing], output: ActorRef[Data], weight: Double): Behavior[SynapseSignal] = Partial[SynapseSignal] {
+    case Data(id,di,f,w) =>
+      output ! Data(id,di,f, weight)
       run(input, output, weight)
 
     case UpdateWeight(newWeight) =>
