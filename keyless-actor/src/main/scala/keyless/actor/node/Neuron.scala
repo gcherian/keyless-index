@@ -10,7 +10,6 @@ import java.util.Date
 import akka.typed.ScalaDSL._
 import akka.typed.{ActorRef, Behavior, Props}
 
-import scala.reflect.ClassTag
 
 class Neuron {
 
@@ -69,7 +68,7 @@ trait SynapseSignal
 
 case object Ack
 
-case class  Data(id:String, dimension:Int, feature:Double, weight:Double) extends NeuronSignal with SynapseSignal
+case class  Data(id:String, dimension:String, feature:Double, weight:Double) extends NeuronSignal with SynapseSignal
 
 case class UpdateBias(bias: Double) extends NeuronSignal
 

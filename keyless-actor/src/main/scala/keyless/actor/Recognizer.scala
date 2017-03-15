@@ -43,10 +43,11 @@ class Recognizer(val name: String) extends Synapse {
       if (allInputsAvailable(featureGroup, weightGroup, inputs)) {
         val activation = activationFunction(weightGroup.zip(featureGroup).map(x => x._1 * x._2).sum + bias)
         println(s"Activation $activation using features $featureGroup for Data : $id $di $f $w")
-        outputs.foreach(_ ! Data(id,di,activation,w))
+        outputs.foreach(_ ! Data(di,name,activation,w))
 
         feedForward(inputs, outputs, bias, activationFunction, Vector(), Vector())
       } else {
+
         feedForward(inputs, outputs, bias, activationFunction, weightGroup, featureGroup)
       }
 

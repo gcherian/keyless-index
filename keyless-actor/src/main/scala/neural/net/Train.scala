@@ -17,7 +17,7 @@ import akka.typed.ScalaDSL._
 import akka.typed.AskPattern._
 import keyless.actor.Recognizer
 
-object Main extends App {
+object Train extends App {
 
 
   override def main(params: Array[String]) = {
@@ -128,9 +128,9 @@ object Main extends App {
             .foreach { l =>
               val splits = l.split(",")
 
-              val who = new Random().nextInt(100)
-              val what = new Random().nextInt(10)
-              val when = new Random().nextInt(23)
+              val who = "User" +new Random().nextInt(100)
+              val what = "Activity"+new Random().nextInt(10)
+              val when = "Hour"+new Random().nextInt(23)
 
               inputLayers(0) ! Data(UUID.randomUUID().toString,who,splits(0).toDouble,0.7)
               inputLayers(1) ! Data(UUID.randomUUID().toString,what,splits(1).toDouble,0.2)
