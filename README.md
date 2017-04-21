@@ -104,7 +104,8 @@ Spark brings a distributed abstraction of data for inmemory processing, however 
     
     
 
+Keyless Actor
+------------------------------
 
-
-
+Keyless Actor builds on the keyless index to model a Neural Network using Akka Actors. Each Actor is a Node that is connected to each other through Synapses. A Node acts like a Recognizer for recognizing a specific pattern. There is a hierarchy in the recognizers similiar to the hierarchy which the brain uses to model the world.
 
